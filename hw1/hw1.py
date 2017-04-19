@@ -42,18 +42,21 @@ stemmer = PorterStemmer() #Create a stemmer object
 for i in range(len(prep_data)):
     prep_data[i] = [stemmer.stem(elem) for elem in prep_data[i]]
 
-#Unique terms
-
-unique_tokens = []
-
-for i in range(len(prep_data)):
-    for word in prep_data[i]:
-        if word not in unique_tokens:
-            unique_tokens.extend(word)
 
 #tf-idf the data
 
-vectorizer = TfidfVectorizer() #Create a tfidf object
+def stem(tokens,stemmer):
+    stems = [stemmer.stem(token) for token in tokens]
+    return stems
+    
+def tokenizer(doc):
+    stemmer = PorterStemmer()
+    tokens = nltk.word_tokenize(doc.lower())
+    stems = stem(tokens,stemmer)
+    return stems
+
+vectorizer = TfidfVectorizer(tokenizer = tokenizer, 
+                             stop_words = stopwords.words('english')) #Create a tfidf object
 tfidfmat = vectorizer.fit_transform(data['speech'])
 
 tfidfmat = tfidfmat.toarray()
