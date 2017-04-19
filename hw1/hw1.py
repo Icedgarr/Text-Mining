@@ -51,6 +51,16 @@ for i in range(len(prep_data)):
         if word not in unique_tokens:
             unique_tokens.extend(word)
 
+#tf-idf the data
+
+vectorizer = TfidfVectorizer() #Create a tfidf object
+tfidfmat = vectorizer.fit_transform(data['speech'])
+
+tfidfmat = tfidfmat.toarray()
+
+tfidfmat.sum()/(len(tfidfmat)*tfidfmat.shape[1])
+
+
 
 
 
