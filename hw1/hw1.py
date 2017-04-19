@@ -31,6 +31,12 @@ for i in range(len(prep_data)):
                                     re.sub('[^\\w]','',w)!=''] 
         
 
+#Stem the data
+
+stemmer = PorterStemmer() #Create a stemmer object
+
+for i in range(len(prep_data)):
+    prep_data[i] = [stemmer.stem(elem) for elem in prep_data[i]]
 
 
 
