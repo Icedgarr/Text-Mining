@@ -19,6 +19,8 @@ path = "/home/roger/Desktop/BGSE/14D010 Text Mining for Social Sciences/Text-Min
 
 data = pd.read_table(path+"/speech_data_extend.txt", encoding="utf-8")
 
+data = data.loc[data['year']>=1900]
+data = data.reset_index()
 #Tokenize
 
 prep_data = data.apply(lambda row: 
@@ -30,9 +32,7 @@ stop_w=set(stopwords.words('english'))
 
 
 for i in range(len(prep_data)):
-    prep_data[i] = [re.sub('[^\\w]','',w) for w in prep_data[i] 
-                                    if (re.sub('[^\\w]','',w) not in stop_w) and 
-                                    re.sub('[^\\w]','',w)!=''] 
+    prep_data[i] = [w for w in prep_data[i] if w not in stop_w and w.isalpha()] 
         
 
 #Stem the data
@@ -45,6 +45,12 @@ for i in range(len(prep_data)):
 
 #tf-idf the data
 
+unique_words = np.unique([word for doc in prep_data for word in doc])
+
+
+
+
+
 def stem(tokens,stemmer):
     stems = [stemmer.stem(token) for token in tokens]
     return stems
@@ -52,16 +58,15 @@ def stem(tokens,stemmer):
 def tokenizer(doc):
     stemmer = PorterStemmer()
     tokens = nltk.word_tokenize(doc.lower())
+    tokens = [w for w in tokens if w not in stop_w and w.isalpha()]
     stems = stem(tokens,stemmer)
     return stems
 
-vectorizer = TfidfVectorizer(tokenizer = tokenizer, 
-                             stop_words = stopwords.words('english')) #Create a tfidf object
+vectorizer = TfidfVectorizer(tokenizer = tokenizer) #Create a tfidf object
 tfidfmat = vectorizer.fit_transform(data['speech'])
 
 tfidfmat = tfidfmat.toarray()
 
-tfidfmat.sum()/(len(tfidfmat)*tfidfmat.shape[1])
 
 
 
