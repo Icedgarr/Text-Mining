@@ -25,6 +25,7 @@ def stem(tokens,stemmer):
 def tokenizer(doc):
     stemmer = PorterStemmer()
     tokens = nltk.word_tokenize(doc.lower())
+    tokens = [w for w in tokens if w not in stop_w and w.isalpha()]
     stems = stem(tokens,stemmer)
     return stems
 
@@ -48,7 +49,6 @@ def tfidfmat_to_df(tfidftable):
     for key, value in tfidftable.items():
         temp = [key,value]
         dictlist.append(temp)
-
     df_temp = pd.DataFrame(dictlist)
     return df_temp
 
