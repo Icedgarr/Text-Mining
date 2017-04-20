@@ -131,10 +131,13 @@ no_hat_values = (DemRep, Dem2, Rep2)
 hat_values = (DemRep_hat, Dem2_hat, Rep2_hat)
 
 fig, ax = plt.subplots()
-rects1 = ax.bar(ind, no_hat_values, width, color='r', yerr=no_hat_values)
-rects2 = ax.bar(ind + width, hat_values, width, color='b', yerr=hat_values)
+rects1 = ax.bar(ind, no_hat_values, width, color='r')
+rects2 = ax.bar(ind + width, hat_values, width, color='b')
 
-
+ax.set_ylabel('Cosimilarity')
+ax.set_title('Cosimilarity between Democrats y Republicans')
+ax.set_xticks(ind + width / 2)
+ax.set_xticklabels(('DemRep', 'DemDem', 'RepRep'))
 
 
 
