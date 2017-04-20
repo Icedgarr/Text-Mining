@@ -47,6 +47,8 @@ for i in range(len(prep_data)):
 
 unique_words = np.unique([word for doc in prep_data for word in doc])
 
+num_words_cutoff = round(0.1*len(unique_words))
+
 
 
 
@@ -62,7 +64,7 @@ def tokenizer(doc):
     stems = stem(tokens,stemmer)
     return stems
 
-vectorizer = TfidfVectorizer(tokenizer = tokenizer) #Create a tfidf object
+vectorizer = TfidfVectorizer(tokenizer = tokenizer, max_features = num_words_cutoff) #Create a tfidf object
 tfidfmat = vectorizer.fit_transform(data['speech'])
 
 tfidfmat = tfidfmat.toarray()
