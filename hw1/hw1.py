@@ -9,7 +9,6 @@ Created on Tue Apr 18 20:23:18 2017
 import pandas as pd
 import numpy as np
 import nltk
-import re
 from nltk.corpus import stopwords
 from nltk import PorterStemmer
 import sklearn
@@ -96,7 +95,7 @@ S_hat = A.dot(V).dot(B)
 
 #cosine similarities
 
-# Cosine similarity:
+# Cosine similarities:
 def cos_sim (doc1, doc2):
     if np.sum(doc1)==0 or np.sum(doc2)==0:
         sim = 0
