@@ -84,9 +84,35 @@ Col_Gibbs = tpm.LDA.LDAGibbs(prep_data,K)
 Col_Gibbs.alpha
 Col_Gibbs.beta
 
-Col_Gibbs.sample(500,50,10)
+#burn_samples are the number of samples that we will throw (we use them 
+#order to get convergence)
 
-Col_Gibbs.perplexity()
+#jump is the number of samples that we will skip before recording a sample
+#to use afterwards.
+
+#used_samples is the number of samples that will be used to estimate the topics
+
+burn_samples = 1000
+jumps = 50
+used_samples = 10
+
+Col_Gibbs.sample(burn_samples,jumps,used_samples)
+
+Col_Gibbs.perplexity() #If it is constant, it is a good sign. 
+                       #Otherwise we need to burn more samples.
+
+word_topics = Col_Gibbs.tt #prob of each word to belong to each topic
+doc_topics = Col_Gibbs.dt #prob of each doc to belong to each topic
+
+
+#Col_Gibbs.topic_content(20)
+
+dt = Col_Gibbs.dt_avg() #For each doc, prob of each topic
+
+
+
+
+
 
 #K, S, alpha, eta = 2, 1000, 0.1, 0.01
 #Col_Gibbs1 = lda.LDA(n_topics=K, n_iter=S, alpha=alpha, eta=eta)
