@@ -11,7 +11,8 @@ import numpy as np
 from nltk.corpus import stopwords
 from nltk import PorterStemmer, word_tokenize
 from numpy.random import dirichlet
-import random
+from collections import Counter
+import time
 ### GIBBS SAMPLER
 
 
@@ -39,9 +40,16 @@ prep_data, unique_words = data_preparation(data)
 D = len(prep_data) #Number of documents
 K = 2 #Number of topics
 V = len(unique_words)#Number of unique terms
-Z = prep_data.apply(lambda row: random.choices(range(1,(K+1)),k=len(prep_data[row]))) #Z_dn
+def simulate(K, row):
+    samples = np.random.multinomial(1,[1/K]*K,len(prep_data[row])).tolist()
+    samples_correct = []
+    for s in samples:
+        samples_correct.append(s.index(1))
+    return samples_correct
+Z = prep_data.apply(lambda row: simulate(K,row)) #Z_dn        
 N = np.zeros((D,K))
 M = np.zeros((K,V))
+
 #Initial values (I took Euan's, no idea how to set them)
 alpha = 50/K
 eta = 200/V
@@ -63,27 +71,57 @@ def sample_topic(Z, theta, beta):
         for i in range(n):
             beta_v = beta[unique_words.index(prep_data[d][i])]
             probs = (theta[d,:]*beta_v)/np.sum(theta[d,:]*beta_v)
-            Z[d][i] = np.random.multinomial(1, probs).tolist().index(1)+1
-
-sample_topic(Z, theta, beta)
+            Z[d][i] = np.random.multinomial(1, probs).tolist().index(1)
+    return Z
+#sample_topic(Z, theta, beta)
 
 ### Sample for theta
 
 def sample_theta(Z,alpha,theta):
-    N = Z.apply(lambda row: np.unique(row, return_counts=True)[1])
-    D = theta.shape[0]
+    D,K = theta.shape
+    N = np.zeros((D,K))
     for d in range(D):
-        theta[d,:] = dirichlet(N[d] + alpha)
+        N[d,:] = np.unique(Z[d], return_counts=True)[1]
+        theta[d,:] = dirichlet(N[d,:] + alpha)
     return theta
 
-theta = sample_theta(N,alpha,theta)
+#theta = sample_theta(Z,alpha,theta)
 
 ### Sample for beta
 
-Z[d]
-
-def sample_beta(M,eta,beta):
+def sample_beta(Z,prep_data,eta,beta):
     K = beta.shape[1]
+    M = np.zeros((K,V))
+    #Generate M
+    s = [i for sublist in prep_data for i in sublist ]
+    z_s = [z for sublist in Z for z in sublist]
+    for k in range(K):
+        words = [s[i] for i in range(len(s)) if z_s[i] == k]
+        counts = Counter(words)
+        for v in range(len(unique_words)):
+            if unique_words[v] in counts: M[k,v] = counts[unique_words[v]]
+    #Generate beta
     for k in range(K):
         beta[:,k] = dirichlet(M[k,:] + eta)
     return beta
+
+#beta = sample_beta(Z,prep_data,eta,beta)
+
+
+def gibbs_sampler(n_iter,prep_data,alpha,eta,K):
+    ## Initialize objects
+    D = len(prep_data)
+    theta = dirichlet([alpha]*K,D)
+    beta = dirichlet([eta]*K,V)
+    Z = prep_data.apply(lambda row: simulate(K,row))
+    for i in range(n_iter):
+        print('Iteration nº:'+ str(i))
+        start = time.time()
+        Z = sample_topic(Z,theta,beta)
+        theta = sample_theta(Z,alpha,theta)
+        beta = sample_beta(Z,prep_data,eta,beta)
+        print('Duration:'+ str(time.time()-start))
+    return Z,theta,beta
+
+
+Z,theta,beta = gibbs_sampler(10,prep_data,alpha,eta,3)
