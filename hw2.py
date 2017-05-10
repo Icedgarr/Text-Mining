@@ -12,9 +12,10 @@ from nltk.corpus import stopwords
 from nltk import PorterStemmer
 import sklearn
 from sklearn.feature_extraction.text import TfidfVectorizer
-import lda
+#import lda
 from collections import Counter
 import scipy.sparse as ssp
+import topicmodels as tpm
 
 
 path = "/home/roger/Desktop/BGSE/courses/14D010 Text Mining for Social Sciences/Text-Mining/hw1"
@@ -76,13 +77,20 @@ unique_words = np.unique([word for doc in prep_data for word in doc])
 
 X = count_words(prep_data)
 
-K, S, alpha, eta = 2, 1000, 0.1, 0.01
+K = 2
 
-Col_Gibbs = lda.LDA(n_topics=K, n_iter=S, alpha=alpha, eta=eta)
+Col_Gibbs = tpm.LDA.LDAGibbs(prep_data,K)
 
-a = Col_Gibbs.fit_transform(X)
-Col_Gibbs.transform(X)
-a.get_params()
+Col_Gibbs.alpha
+Col_Gibbs.beta
 
-X = lda.datasets.load_reuters()
+Col_Gibbs.sample(500,50,10)
+
+Col_Gibbs.perplexity()
+
+#K, S, alpha, eta = 2, 1000, 0.1, 0.01
+#Col_Gibbs1 = lda.LDA(n_topics=K, n_iter=S, alpha=alpha, eta=eta)
+#Col_Gibbs1.fit_transform(X)
+#Col_Gibbs1.doc_topic_
+
 
