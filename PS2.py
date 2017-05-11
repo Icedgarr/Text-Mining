@@ -122,6 +122,8 @@ def gibbs_sampler(n_iter,prep_data,alpha,eta, K, X, N, prop_perplexity):
         theta_dist.append(theta)
         beta_dist.append(beta)
         np.save(path2+"theta.npy",theta_dist)
+        np.save(path2+"Z_dist.npy",Z_dist)
+        np.save(path2+"beta_dist.npy",beta_dist)
         print('Duration:'+ str(time.time()-start))
     return Z_dist, beta_dist, theta_dist, perplexity
 
