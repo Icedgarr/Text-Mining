@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat May  6 15:40:29 2017
-
-@author: javi
-"""
-
 import pandas as pd
 import numpy as np
 from nltk.corpus import stopwords
