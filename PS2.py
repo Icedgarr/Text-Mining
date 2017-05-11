@@ -6,14 +6,13 @@ from numpy.random import dirichlet
 from collections import Counter
 from scipy.sparse import csr_matrix
 import time
-### GIBBS SAMPLER
 
+### GIBBS SAMPLER
 
 path = "/home/chpmoreno/Dropbox/Documents/BGSE/Third_Term/TMSC/homeworks/github/Text-Mining/hw1/"
 data = pd.read_table(path+"speech_data_extend.txt",encoding="utf-8")
 data = data.loc[data['year']>=1946]
 data = data.reset_index()
-
 
 def data_preparation(data):
     prep_data = data.apply(lambda row: #tokenize
@@ -45,19 +44,6 @@ def data_preparation(data):
 # n in document d. To assign a new topic to each entry, we need to match term v
 # in Beta_v (which will be stored in "unique_words") with word n in Z_dn (which
 # will be stored in "prep_data").
-
-# Term count matrix
-def term_count(prep, idx):
-    # I've made the count matrix a sparse matrix to save memory and speed up perplexity calculation
-    from utils import Counter
-    D = len(stemmed)
-    V = len(get_vocab(stemmed))
-    X = np.zeros((D,V))
-    for k in range(D):
-        counts = Counter(stemmed[k])
-        for word in set(stemmed[k]):
-            X[k,idx[word]] = counts[word]
-    return ssp.csr_matrix(X.astype(int))
 
 ### Auxiliar functions Z sample
 def simulate(K, row):
@@ -133,7 +119,7 @@ def gibbs_sampler(n_iter,prep_data,alpha,eta, K, X, N, prop_perplexity):
         beta = sample_beta(Z,prep_data,eta,beta)
         if (i % (round(n_iter * prop_perplexity) + 1)) == 0:
             perplexity.append(np.exp(-np.sum(X.multiply(np.log(theta.dot(beta.T))))/N))
-        #Z_dist.append(Z)
+        Z_dist.append(Z)
         theta_dist.append(theta)
         #beta_dist.append(beta)
         print('Duration:'+ str(time.time()-start))
