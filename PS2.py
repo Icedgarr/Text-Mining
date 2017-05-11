@@ -36,9 +36,6 @@ def data_preparation(data):
     X = csr_matrix(X.astype(int))
     return prep_data, unique_words, X, N
 
-#theta = dirichlet([alpha]*K,D)
-#beta = dirichlet([eta]*K,V)
-
 # Problem: generate Z_dn, a list of dimension d of lists, each one of different length
 # (number of terms of each document) with values in k. So: topic allocation of word
 # n in document d. To assign a new topic to each entry, we need to match term v
@@ -107,9 +104,9 @@ def gibbs_sampler(n_iter,prep_data,alpha,eta, K, X, N, prop_perplexity):
     theta = dirichlet([alpha]*K,D)
     beta = dirichlet([eta]*K,V)
     Z = prep_data.apply(lambda row: simulate(K,row))
-    #Z_dist = []
+    Z_dist = []
     theta_dist = []
-    #beta_dist = []
+    beta_dist = []
     perplexity = []
     for i in range(n_iter):
         print('Iteration nº:'+ str(i))
@@ -121,18 +118,12 @@ def gibbs_sampler(n_iter,prep_data,alpha,eta, K, X, N, prop_perplexity):
             perplexity.append(np.exp(-np.sum(X.multiply(np.log(theta.dot(beta.T))))/N))
         Z_dist.append(Z)
         theta_dist.append(theta)
-        #beta_dist.append(beta)
+        beta_dist.append(beta)
         print('Duration:'+ str(time.time()-start))
-    return Z_dist, theta_dist, perplexity
+    return Z_dist, beta_dist, theta_dist, perplexity
 
 ### Initial parameters
 prep_data, unique_words, X, N = data_preparation(data)
-
-#D = len(prep_data) #Number of documents
-#V = len(unique_words)#Number of unique terms
-#Z = prep_data.apply(lambda row: simulate(K,row)) #Z_dn
-#N = np.zeros((D,K))
-#M = np.zeros((K,V))
 
 #Initial values (reference original paper)
 K = 2 #Number of topics
@@ -140,4 +131,4 @@ alpha = 50/K
 V = len(unique_words)
 eta = 200/V
 
-Z_2, theta_2, perplex_2 = gibbs_sampler(100, prep_data, alpha, eta, K, X, N, 0.05)
+Z_2, beta_2, theta_2, perplex_2 = gibbs_sampler(100, prep_data, alpha, eta, K, X, N, 0.05)
