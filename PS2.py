@@ -36,7 +36,7 @@ def data_preparation(data):
     X = csr_matrix(X.astype(int))
     return prep_data, unique_words, X, N
 
-# Problem: generate Z_dn, a list of dimension d of lists, each one of different length
+# Problem: generate Z_d,n, a list of dimension d of lists, each one of different length
 # (number of terms of each document) with values in k. So: topic allocation of word
 # n in document d. To assign a new topic to each entry, we need to match term v
 # in Beta_v (which will be stored in "unique_words") with word n in Z_dn (which
