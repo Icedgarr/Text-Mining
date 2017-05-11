@@ -16,6 +16,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from collections import Counter
 import scipy.sparse as ssp
 import topicmodels as tpm
+import matplotlib.pyplot as plt
 
 
 path = "/home/roger/Desktop/BGSE/courses/14D010 Text Mining for Social Sciences/Text-Mining/hw1"
@@ -111,9 +112,8 @@ for k in K:
             perps[str((k,a,b))] = perp_coll
                        #Otherwise we need to burn more samples.
 
-mins = [(item,min(perps[item])) for item in perps]
 
-Col_Gibbs = tpm.LDA.LDAGibbs(prep_data,10)
+Col_Gibbs = tpm.LDA.LDAGibbs(prep_data,50)
 
 Col_Gibbs.alpha    
     
@@ -125,10 +125,17 @@ Col_Gibbs.sample(burn_samples,jumps,used_samples)
 
 perp_coll = Col_Gibbs.perplexity()
 
-perps[str((10,5,0.0241))] = perp_coll
+perps[str((50,1,0.0241))] = perp_coll
 
+mins = [(item,min(perps[item])) for item in perps]
 
-    
+plt.plot(perps['(2, 25.0, 0.0241)'], lw = 1., label = 'K=2')
+plt.plot(perps['(5, 10, 0.0241)'], lw = 1., label = 'K=5')
+plt.plot(perps['(10, 5, 0.0241)'], lw = 1., label = 'K=10')
+plt.legend()
+plt.ylabel('perplexity for different K')
+plt.savefig('per_coll.png')
+
 
 word_topics = Col_Gibbs.tt #prob of each word to belong to each topic
 doc_topics = Col_Gibbs.dt #prob of each doc to belong to each topic
