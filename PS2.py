@@ -10,6 +10,7 @@ import time
 ### GIBBS SAMPLER
 
 path = "/home/chpmoreno/Dropbox/Documents/BGSE/Third_Term/TMSC/homeworks/github/Text-Mining/hw1/"
+path2 = "/home/chpmoreno/Dropbox/Documents/BGSE/Third_Term/TMSC/homeworks/github/Text-Mining/"
 data = pd.read_table(path+"speech_data_extend.txt",encoding="utf-8")
 data = data.loc[data['year']>=1946]
 data = data.reset_index()
@@ -116,9 +117,11 @@ def gibbs_sampler(n_iter,prep_data,alpha,eta, K, X, N, prop_perplexity):
         beta = sample_beta(Z,prep_data,eta,beta)
         if (i % (round(n_iter * prop_perplexity) + 1)) == 0:
             perplexity.append(np.exp(-np.sum(X.multiply(np.log(theta.dot(beta.T))))/N))
+            np.save(path2+"perplexity.npy",perplexity)
         Z_dist.append(Z)
         theta_dist.append(theta)
         beta_dist.append(beta)
+        np.save(path2+"theta.npy",theta_dist)
         print('Duration:'+ str(time.time()-start))
     return Z_dist, beta_dist, theta_dist, perplexity
 
