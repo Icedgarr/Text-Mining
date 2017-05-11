@@ -17,6 +17,7 @@ from collections import Counter
 import scipy.sparse as ssp
 import topicmodels as tpm
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 path = "/home/roger/Desktop/BGSE/courses/14D010 Text Mining for Social Sciences/Text-Mining/hw1"
@@ -129,12 +130,74 @@ perps[str((50,1,0.0241))] = perp_coll
 
 mins = [(item,min(perps[item])) for item in perps]
 
+
+
 plt.plot(perps['(2, 25.0, 0.0241)'], lw = 1., label = 'K=2')
 plt.plot(perps['(5, 10, 0.0241)'], lw = 1., label = 'K=5')
 plt.plot(perps['(10, 5, 0.0241)'], lw = 1., label = 'K=10')
+plt.plot(perps['(50, 1, 0.0241)'], lw = 1., label = 'K=50')
 plt.legend()
-plt.ylabel('perplexity for different K')
+plt.ylabel('perplexity')
+plt.xlabel('25x samples')
+plt.title('perplexity across different K')
 plt.savefig('per_coll.png')
+
+
+
+
+perps1 = {}
+K = [2,5,10,50]
+for k in [2,5,10,50]:
+    
+    Col_Gibbs = tpm.LDA.LDAGibbs(prep_data,50)
+    burn_samples = 0
+    jumps = 25
+    used_samples = 150
+
+    Col_Gibbs.sample(burn_samples,jumps,used_samples)
+
+    perp_coll = Col_Gibbs.perplexity()
+
+    perps1[str((k,Col_Gibbs.alpha,0.0241))] = perp_coll
+    
+a = [10,2,5,50]
+i = 0
+for item in perps1:
+    plt.plot(perps1[item], lw = 1., label = 'K='+str(a[i]))
+    plt.legend()
+    plt.ylabel('perplexity')
+    plt.xlabel('25x samples')
+    plt.title('perplexity across different K')
+    plt.savefig('per_coll.png')
+    i+=1
+
+K = 50
+
+Col_Gibbs = tpm.LDA.LDAGibbs(prep_data,K)
+alpha =  Col_Gibbs.alpha
+
+burn_samples = 800
+jumps = 25
+used_samples = 100
+
+Col_Gibbs.sample(burn_samples,jumps,used_samples)
+
+perp_coll = Col_Gibbs.perplexity()
+
+doc_topics = Col_Gibbs.dt #prob of each doc to belong to each topic
+
+Nd = np.array([len(par) for par in prep_data])
+Nd = Nd.reshape((len(prep_data),1))
+Ndtop = Nd*doc_topics
+
+theta_coll = (Ndtop+alpha)/(Nd+K*alpha)
+theta_coll =  pd.DataFrame(theta_coll)
+pd.DataFrame.to_csv(theta_coll,path_or_buf='data/theta_collapsed.csv',index=False)
+
+
+theta_uncoll = pd.read_csv('data/theta_uncollapsed.csv') 
+theta_uncoll.drop( 'Unnamed: 0',axis=1,inplace=True)
+theta_uncoll = np.array(theta_uncoll)
 
 
 word_topics = Col_Gibbs.tt #prob of each word to belong to each topic
