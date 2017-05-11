@@ -77,29 +77,58 @@ unique_words = np.unique([word for doc in prep_data for word in doc])
 
 X = count_words(prep_data)
 
-K = 2
+K, alpha, beta = [2, 5, 10], [25, 10, 5], [0.0241, 0.0241, 0.0241]
 
-Col_Gibbs = tpm.LDA.LDAGibbs(prep_data,K)
+K, alpha, beta = [2, 5, 10], [50., 25., 10., 5.], [0.0241, 0.01, 0.5]
 
-Col_Gibbs.alpha
-Col_Gibbs.beta
+#K, alpha, beta = [2, 5], [25.], [0.0241]
 
+perps = {}
+
+for k in K:
+    for a in alpha:
+        for b in beta:
+            
+            Col_Gibbs = tpm.LDA.LDAGibbs(prep_data,k)
+    
+            Col_Gibbs.set_priors(a,b)
 #burn_samples are the number of samples that we will throw (we use them 
 #order to get convergence)
-
+    
 #jump is the number of samples that we will skip before recording a sample
 #to use afterwards.
-
+    
 #used_samples is the number of samples that will be used to estimate the topics
+    
+            burn_samples = 0
+            jumps = 25
+            used_samples = 150
 
-burn_samples = 1000
-jumps = 50
-used_samples = 10
+            Col_Gibbs.sample(burn_samples,jumps,used_samples)
+
+            perp_coll = Col_Gibbs.perplexity() #If it is constant, it is a good sign. 
+
+            perps[str((k,a,b))] = perp_coll
+                       #Otherwise we need to burn more samples.
+
+mins = [(item,min(perps[item])) for item in perps]
+
+Col_Gibbs = tpm.LDA.LDAGibbs(prep_data,10)
+
+Col_Gibbs.alpha    
+    
+burn_samples = 0
+jumps = 25
+used_samples = 150
 
 Col_Gibbs.sample(burn_samples,jumps,used_samples)
 
-Col_Gibbs.perplexity() #If it is constant, it is a good sign. 
-                       #Otherwise we need to burn more samples.
+perp_coll = Col_Gibbs.perplexity()
+
+perps[str((10,5,0.0241))] = perp_coll
+
+
+    
 
 word_topics = Col_Gibbs.tt #prob of each word to belong to each topic
 doc_topics = Col_Gibbs.dt #prob of each doc to belong to each topic
