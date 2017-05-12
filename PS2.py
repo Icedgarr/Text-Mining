@@ -10,7 +10,7 @@ import time
 ### GIBBS SAMPLER
 
 path = "/home/chpmoreno/Dropbox/Documents/BGSE/Third_Term/TMSC/homeworks/github/Text-Mining/hw1/"
-path2 = "/home/chpmoreno/Dropbox/Documents/BGSE/Third_Term/TMSC/homeworks/github/Text-Mining/"
+path2 = "/home/chpmoreno/Dropbox/Documents/BGSE/Third_Term/TMSC/homeworks/github/Text-Mining/hw2/data2/"
 data = pd.read_table(path+"speech_data_extend.txt",encoding="utf-8")
 data = data.loc[data['year']>=1946]
 data = data.reset_index()
@@ -130,10 +130,15 @@ def gibbs_sampler(n_iter,prep_data,alpha,eta, K, X, N, prop_perplexity):
 ### Initial parameters
 prep_data, unique_words, X, N = data_preparation(data)
 
-#Initial values (reference original paper)
-K = 2 #Number of topics
+#Initial values (Griffiths and Steyvers, 2004)
+K = 50 #Number of topics
 alpha = 50/K
 V = len(unique_words)
 eta = 200/V
 
 Z_2, beta_2, theta_2, perplex_2 = gibbs_sampler(100, prep_data, alpha, eta, K, X, N, 0.05)
+
+#np.save(path2+"theta.npy",theta_2)
+#np.save(path2+"Z_dist.npy",Z_2)
+#np.save(path2+"beta_dist.npy",beta_2)
+#np.save(path2+"perplexity.npy",perplex_2)
