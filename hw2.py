@@ -201,10 +201,6 @@ theta_coll = (Ndtop+alpha)/(Nd+K*alpha)
 theta_coll =  pd.DataFrame(theta_coll)
 pd.DataFrame.to_csv(theta_coll,path_or_buf=path+'theta_coll_k50.csv',index=False)
 
-theta_coll.mean()
-#theta_uncoll.mean()
-
-# from collapsed gibbs sampler
 mean_coll = np.array(theta_coll.mean(axis=0))
 var_coll = np.array(np.var(theta_coll, axis=0))
 
