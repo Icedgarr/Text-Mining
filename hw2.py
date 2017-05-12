@@ -183,16 +183,47 @@ used_samples = 100
 Col_Gibbs.sample(burn_samples,jumps,used_samples)
 
 perp_coll = Col_Gibbs.perplexity()
+pd.DataFrame.to_csv(pd.DataFrame(perp_coll),path_or_buf=path+'perp_coll_k50.csv',index=False)
 
-doc_topics = Col_Gibbs.dt #prob of each doc to belong to each topic
+doc_topics = Col_Gibbs.dt_avg()
+
+pd.DataFrame.to_csv(pd.DataFrame(doc_topics),path_or_buf=path+'doc_top_k50.csv',index=False)
+
+
+
 
 Nd = np.array([len(par) for par in prep_data])
 Nd = Nd.reshape((len(prep_data),1))
-Ndtop = Nd*doc_topics
+Ndtop = np.array(Nd*doc_topics)
+
 
 theta_coll = (Ndtop+alpha)/(Nd+K*alpha)
 theta_coll =  pd.DataFrame(theta_coll)
-pd.DataFrame.to_csv(theta_coll,path_or_buf='data/theta_collapsed.csv',index=False)
+pd.DataFrame.to_csv(theta_coll,path_or_buf=path+'theta_coll_k50.csv',index=False)
+
+theta_coll.mean()
+#theta_uncoll.mean()
+
+# from collapsed gibbs sampler
+mean_coll = np.array(theta_coll.mean(axis=0))
+var_coll = np.array(np.var(theta_coll, axis=0))
+
+print((mean_coll,var_coll))
+
+
+
+
+
+# from uncollapsed gibbs sampler
+mean_un = np.array(theta_uncoll.mean(axis=0))
+std_un = np.array(theta_uncoll.std(axis=0))
+var_un = np.array(np.var(theta_uncoll, axis=0))
+
+basic_stats = pd.DataFrame(np.vstack((m_c,m_u,st_c,st_u,var_c,var_u)).T)
+basic_stats.columns = ['mean_c','mean_unc','sd_c','sd_unc','var_c','var_u']
+basic_stats
+
+
 
 
 theta_uncoll = pd.read_csv('data/theta_uncollapsed.csv') 
